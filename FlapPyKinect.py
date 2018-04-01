@@ -6,6 +6,7 @@ import _ctypes
 import pygame
 import sys
 import math
+import random
 
 class GameRuntime(object):
     def __init__(self):
@@ -13,12 +14,18 @@ class GameRuntime(object):
 
         self.screen_width = 1920
         self.screen_height = 1080
-        self.bird_height = self.screen_height/2
+
         self.prev_right_hand_height = 0
         self.prev_left_hand_height = 0
         self.cur_right_hand_height = 0
         self.cur_left_hand_height = 0
+
+        self.gameover = False
+
         self.pipe_x = self.screen_width
+        self.pipe_opening = random.randint(100, self.screen_height)
+
+        self.bird_height = self.screen_height/2
         self.flap = 0
 
         # Used to manage how fast the screen updates
@@ -39,20 +46,30 @@ class GameRuntime(object):
         # here we will store skeleton data 
         self.bodies = None
 
+    def collision(self):
+        bird_x = int(self.screen_width/2)
+        bird_y = int(self.screen_height - self.bird_height)
+    
+        if ((bird_x < self.pipe_x + 240 and bird_x > self.pipe_x - 40) and
+            (bird_y < self.pipe_opening - 110 or bird_y > self.pipe_opening + 110)):
+            print("asdfljasd")
+            self.gameover = True
+
+
     def draw_bird(self):
         pygame.draw.circle(self.frame_surface, (200,200,0), (int(self.screen_width/2), int(self.screen_height - self.bird_height)), 40)
 
     def draw_pipes(self):
         # top pipe
-        pygame.draw.rect(self.frame_surface, (0, 150, 0), (self.pipe_x, 0, 200, 400))
+        pygame.draw.rect(self.frame_surface, (0, 150, 0), (self.pipe_x, 0, 200, self.pipe_opening - 150))
 
         # bottom pipe
-        pygame.draw.rect(self.frame_surface, (0, 150, 0), (self.pipe_x, self.screen_height - 400, 200, 400))
+        pygame.draw.rect(self.frame_surface, (0, 150, 0), (self.pipe_x, self.pipe_opening + 150, 200, self.screen_height))
 
     def draw_color_frame(self, frame, target_surface):
         target_surface.lock()
         address = self.kinect.surface_as_array(target_surface.get_buffer())
-        # moving 
+        # replacing old frame with new one
         ctypes.memmove(address, frame.ctypes.data, frame.size)
         del address
         target_surface.unlock()
@@ -61,6 +78,11 @@ class GameRuntime(object):
         # -------- Main Program Loop -----------
         while not self.done:
             # --- Main event loop
+            if self.gameover:
+                font = pygame.font.Font(None, 36)
+                text = font.render("Game over!", 1, (0, 0, 0))
+                self.frame_surface.blit(text, (100,100))
+                break
             for event in pygame.event.get(): # User did something
                 if event.type == pygame.QUIT: # If user clicked close
                     self.done = True # Flag that we are done so we exit this loop
@@ -99,7 +121,7 @@ class GameRuntime(object):
 
             # --- Game logic
             self.bird_height -= 5
-            self.bird_height += self.flap * 250
+            self.bird_height += self.flap * 300
             if self.bird_height <= 0:
                 # Don't let the bird fall off the bottom of the screen
                 self.bird_height = 0
@@ -108,15 +130,19 @@ class GameRuntime(object):
                 self.bird_height = self.screen_height
 
             # Move the pipes to the left
-            self.pipe_x -= 2
+            self.pipe_x -= 5
             # When the pipes are past the bird
             if self.pipe_x < 100:
                 # Reset the pipes back to the other end of the screen
                 self.pipe_x = self.screen_width
+                self.pipe_opening = random.randint(100, self.screen_height)
 
             # Draw graphics
             self.draw_bird()
             self.draw_pipes()
+
+            # Collision checking
+            self.collision()
 
             # Optional debugging text
             #font = pygame.font.Font(None, 36)

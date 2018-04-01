@@ -14,9 +14,27 @@ class GameRuntime(object):
     def __init__(self):
         pygame.init()
 
+        self.screen_width = 1920
+        self.screen_height = 1080
+
+        self.prev_right_hand_height = 0
+        self.prev_left_hand_height = 0
+        self.cur_right_hand_height = 0
+        self.cur_left_hand_height = 0
+
+        self.gameover = False
+
+        self.pipe_x = self.screen_width
+        self.pipe_opening = random.randint(100, self.screen_height)
+
+        self.bird_height = self.screen_height/2
+        self.flap = 0
 
         # Used to manage how fast the screen updates
         self.clock = pygame.time.Clock()
+
+        # Set the width and height of the window [width/2, height/2]
+        self.screen = pygame.display.set_mode((960,540), pygame.HWSURFACE|pygame.DOUBLEBUF, 32)
 
         # Loop until the user clicks the close button.
         self.done = False
@@ -51,10 +69,9 @@ class GameRuntime(object):
                 self.draw_color_frame(frame, self.frame_surface)
                 frame = None # memory save
 
-            # We have a body frame, so can get skeletons
-            if self.kinect.has_new_body_frame(): 
-                self.bodies = self.kinect.get_last_body_frame()
-                # TODO: Handle body input!
+            # TODO: Handle body input
+            #       Bird/Pipe movement
+            #       Collision checking 
 
             # --- copy back buffer surface pixels to the screen, resize it if needed and keep aspect ratio
             # --- (screen size may be different from Kinect's color frame size) 
