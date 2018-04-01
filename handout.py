@@ -14,20 +14,20 @@ class GameRuntime(object):
     def __init__(self):
         pygame.init()
 
-        self.screen_width = 1920
+        self.screenWidth = 1920
         self.screen_height = 1080
 
-        self.prev_right_hand_height = 0
-        self.prev_left_hand_height = 0
-        self.cur_right_hand_height = 0
-        self.cur_left_hand_height = 0
+        self.prevRightHandHeight = 0
+        self.prevLeftHandHeight = 0
+        self.curRightHandHeight = 0
+        self.curLeftHandHeight = 0
 
         self.gameover = False
 
-        self.pipe_x = self.screen_width
-        self.pipe_opening = random.randint(100, self.screen_height)
+        self.pipeX = self.screenWidth
+        self.pipeOpening = random.randint(100, self.screenHeight)
 
-        self.bird_height = self.screen_height/2
+        self.birdHeight = self.screenHeight/2
         self.flap = 0
 
         # Used to manage how fast the screen updates
@@ -43,17 +43,17 @@ class GameRuntime(object):
         self.kinect = PyKinectRuntime.PyKinectRuntime(PyKinectV2.FrameSourceTypes_Color | PyKinectV2.FrameSourceTypes_Body)
 
         # back buffer surface for getting Kinect color frames, 32bit color, width and height equal to the Kinect color frame size
-        self.frame_surface = pygame.Surface((self.kinect.color_frame_desc.Width, self.kinect.color_frame_desc.Height), 0, 32)
+        self.frameSurface = pygame.Surface((self.kinect.color_frame_desc.Width, self.kinect.color_frame_desc.Height), 0, 32)
 
         # here we will store skeleton data 
         self.bodies = None
 
-    def draw_color_frame(self, frame, target_surface):
-        target_surface.lock()
-        address = self.kinect.surface_as_array(target_surface.get_buffer())
+    def drawColorFrame(self, frame, targetSurface):
+        targetSurface.lock()
+        address = self.kinect.surface_as_array(targetSurface.get_buffer())
         ctypes.memmove(address, frame.ctypes.data, frame.size)
         del address
-        target_surface.unlock()
+        targetSurface.unlock()
 
     def run(self):
         # -------- Main Program Loop -----------
@@ -66,7 +66,7 @@ class GameRuntime(object):
             # We have a color frame. Fill out back buffer surface with frame's data 
             if self.kinect.has_new_color_frame():
                 frame = self.kinect.get_last_color_frame()
-                self.draw_color_frame(frame, self.frame_surface)
+                self.drawColorFrame(frame, self.frameSurface)
                 frame = None # memory save
 
             # TODO: Handle body input
@@ -75,11 +75,11 @@ class GameRuntime(object):
 
             # --- copy back buffer surface pixels to the screen, resize it if needed and keep aspect ratio
             # --- (screen size may be different from Kinect's color frame size) 
-            h_to_w = float(self.frame_surface.get_height()) / self.frame_surface.get_width()
-            target_height = int(h_to_w * self.screen.get_width())
-            surface_to_draw = pygame.transform.scale(self.frame_surface, (self.screen.get_width(), target_height));
-            self.screen.blit(surface_to_draw, (0,0))
-            surface_to_draw = None # memory save
+            hToW = float(self.frameSurface.get_height()) / self.frameSurface.get_width()
+            targetHeight = int(hToW * self.screen.get_width())
+            surfaceToDraw = pygame.transform.scale(self.frameSurface, (self.screen.get_width(), target_height));
+            self.screen.blit(surfaceToDraw, (0,0))
+            surfaceToDraw = None # memory save
             pygame.display.update()
 
             # --- Limit to 60 frames per second
