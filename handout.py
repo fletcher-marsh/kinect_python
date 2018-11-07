@@ -48,26 +48,6 @@ class GameRuntime(object):
         # here we will store skeleton data 
         self.bodies = None
 
-    def drawBird(self):
-        pygame.draw.circle(self.frameSurface, (200, 200, 0),
-                           (int(self.screenWidth/2), int(self.screenHeight - self.birdHeight)), 40)
-
-    def drawPipes(self):
-        pygame.draw.rect(self.frameSurface, (0, 150, 0),
-                        (self.pipeX, 0, 200, self.pipeOpening - 150))
-        pygame.draw.rect(self.frameSurface, (0, 150, 0),
-                        (self.pipeX, self.pipeOpening + 150, 200, self.screenHeight))
-
-    def collision(self):
-        birdX = self.screenWidth / 2
-        birdY = self.screenHeight - self.birdHeight
-
-        if ((birdX < self.pipeX + 240 and 
-            birdX > self.pipeX - 40) and
-            (birdY < self.pipeOpening - 110 or
-            birdY > self.pipeOpening + 110)):
-            self.gameover = True
-
     def drawColorFrame(self, frame, targetSurface):
         targetSurface.lock()
         address = self.kinect.surface_as_array(targetSurface.get_buffer())
@@ -79,8 +59,6 @@ class GameRuntime(object):
         # -------- Main Program Loop -----------
         while not self.done:
             # --- Main event loop
-            if self.gameover:
-                break
             for event in pygame.event.get(): # User did something
                 if event.type == pygame.QUIT: # If user clicked close
                     self.done = True # Flag that we are done so we exit this loop
@@ -91,49 +69,15 @@ class GameRuntime(object):
                 self.drawColorFrame(frame, self.frameSurface)
                 frame = None # memory save
 
-            if self.kinect.has_new_body_frame():
-                self.bodies = self.kinect.get_last_body_frame()
-
-                if self.bodies is not None:
-                    for i in range(self.kinect.max_body_count):
-                        body = self.bodies.bodies[i]
-                        if not body.is_tracked:
-                            continue
-                        else:
-                            joints = body.joints
-                            if joints[PyKinectV2.JointType_HandLeft].TrackingState != PyKinectV2.TrackingState_NotTracked:
-                                self.curLeftHandHeight = joints[PyKinectV2.JointType_HandLeft].Position.y
-                            if joints[PyKinectV2.JointType_HandRight].TrackingState != PyKinectV2.TrackingState_NotTracked:
-                                self.curRightHandHeight = joints[PyKinectV2.JointType_HandRight].Position.y
-                self.flap = (self.prevLeftHandHeight - self.curLeftHandHeight) + (self.prevRightHandHeight - self.curRightHandHeight)
-                if self.flap < 0:
-                    self.flap = 0
-
-                self.prevLeftHandHeight = self.curLeftHandHeight
-                self.prevRightHandHeight = self.curRightHandHeight
-
+            # TODO: Handle body input
             #       Bird/Pipe movement
-            self.birdHeight -= 5
-            self.birdHeight += self.flap * 300
-            if self.birdHeight < 0:
-                self.birdHeight = 0
-            if self.birdHight > self.screenHeight:
-                self.screenHeight
-
-            self.pipeX -= 5
-            if self.pipeX < 100:
-                self.pipeX = self.screenWidth
-                self.pipeOpening = random.randint(100, self.screenHeight)
-
-            self.drawBird()
-            self.drawPipe()
             #       Collision checking 
-            self.collision()
+
             # --- copy back buffer surface pixels to the screen, resize it if needed and keep aspect ratio
             # --- (screen size may be different from Kinect's color frame size) 
             hToW = float(self.frameSurface.get_height()) / self.frameSurface.get_width()
             targetHeight = int(hToW * self.screen.get_width())
-            surfaceToDraw = pygame.transform.scale(self.frameSurface, (self.screen.get_width(), target_height));
+            surfaceToDraw = pygame.transform.scale(self.frameSurface, (self.screen.get_width(), targetHeight));
             self.screen.blit(surfaceToDraw, (0,0))
             surfaceToDraw = None # memory save
             pygame.display.update()
