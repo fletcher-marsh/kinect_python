@@ -7,7 +7,7 @@ NOTE: must have a machine capable of
 
 1. Download stuff!
     * [Visual Studio](https://visualstudio.microsoft.com/vs/) (community works!) NOTE: Select the 'Python development' checkbox when the installation prompts you!
-    * [Anaconda 32-bit](https://www.anaconda.com/download/) NOTE: install for all users, and preferably put it on your C:\ drive for easy access
+    * [Anaconda 32-bit](https://repo.anaconda.com/archive/Anaconda3-5.3.0-Windows-x86.exe) NOTE: install for all users, and preferably put it on your C:\ drive for easy access
     * [Kinect V2 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=44561)
 2. In visual studio: View > Other Windows > Python Environments
 3. Click on Python version installed by Anaconda (probably between 3.5 and 3.7, will definitely be 32-bit)
@@ -20,3 +20,4 @@ NOTE: must have a machine capable of
 
 ## Debugging
  * Use the Kinect SDK (Body Basics) while the Kinect is connected to your machine to run diagnostics
+ * `assert sizeof(tagSTATSTG) == 72, sizeof(tagSTATSTG)` or `AssertionError: 80`: You are running Anaconda 64-bit! Change to 32-bit [here](https://repo.anaconda.com/archive/Anaconda3-5.3.0-Windows-x86.exe).
