@@ -21,3 +21,4 @@ NOTE: must have a machine capable of
 ## Debugging
  * Use the Kinect SDK (Body Basics) while the Kinect is connected to your machine to run diagnostics
  * `assert sizeof(tagSTATSTG) == 72, sizeof(tagSTATSTG)` or `AssertionError: 80`: You are running Anaconda 64-bit! Change to 32-bit [here](https://repo.anaconda.com/archive/Anaconda3-5.3.0-Windows-x86.exe).
+ * Numpy import doesn't work: go to PyPI -> type in 'numpy' -> click the uparrow button to upgrade numpy (alternatively you can open the interactive window for anaconda and type `pip install numpy`)
