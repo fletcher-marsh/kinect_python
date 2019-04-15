@@ -18,6 +18,8 @@ NOTE: must have a machine capable of
     * Pygame
     * If doesn't exist already, comtypes
 
+![alt text](https://i.imgur.com/v1AAVIV.png "Kinect Joint Names")
+
 ## Debugging
  * Use the Kinect SDK (Body Basics) while the Kinect is connected to your machine to run diagnostics
  * `assert sizeof(tagSTATSTG) == 72, sizeof(tagSTATSTG)` or `AssertionError: 80`: You are running Anaconda 64-bit! Change to 32-bit [here](https://repo.anaconda.com/archive/Anaconda3-5.3.0-Windows-x86.exe).
